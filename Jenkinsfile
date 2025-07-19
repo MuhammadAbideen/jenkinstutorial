@@ -1,17 +1,14 @@
 pipeline {
-    agent any  // Run on any available agent (controller in this case)
+    agent {
+        docker {
+            image 'ghcr.io/rikorose/gcc-cmake:latest'
+            args '-v jenkins_home:/var/jenkins_home'
+        }
+    }
     stages {
         stage('Checkout') {
             steps {
                 git url: 'https://github.com/MuhammadAbideen/jenkinstutorial.git', branch: 'main'
-            }
-        }
-        stage('Install Dependencies') {
-            steps {
-                sh '''
-                    apt-get update
-                    apt-get install -y cmake g++ make
-                '''
             }
         }
         stage('Build') {
