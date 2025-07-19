@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'ubuntu' }
+    agent any  // Run on any available agent (controller in this case)
     stages {
         stage('Checkout') {
             steps {
@@ -9,8 +9,8 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 sh '''
-                    sudo apt-get update
-                    sudo apt-get install -y cmake g++ ninja-build
+                    apt-get update
+                    apt-get install -y cmake g++ make
                 '''
             }
         }
