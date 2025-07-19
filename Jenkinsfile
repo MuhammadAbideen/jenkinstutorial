@@ -3,8 +3,9 @@ pipeline {
 
     stages {
         stage('Checkout') {
-            agent any  // Use Jenkins host agent
+            agent any
             steps {
+                cleanWs()
                 git url: 'https://github.com/MuhammadAbideen/jenkinstutorial.git', branch: 'main'
             }
         }
@@ -13,6 +14,7 @@ pipeline {
             agent {
                 docker {
                     image 'ghcr.io/rikorose/gcc-cmake:latest'
+                    args '-u root'
                 }
             }
             steps {
@@ -29,10 +31,14 @@ pipeline {
             agent {
                 docker {
                     image 'ghcr.io/rikorose/gcc-cmake:latest'
+                    args '-u root'
                 }
             }
             steps {
-                sh './build/mathdemo'
+                sh '''
+                    chmod +x build/mathdemo
+                    ./build/mathdemo
+                '''
             }
         }
     }
@@ -40,6 +46,10 @@ pipeline {
     post {
         always {
             echo 'Pipeline completed.'
+            cleanWs()
+        }
+        success {
+            echo 'Pipeline succeeded!'
         }
         failure {
             echo 'Pipeline failed!'
