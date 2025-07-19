@@ -1,71 +1,41 @@
 pipeline {
-    agent any
-
-    environment {
-        // Customize these variables according to your needs
-        BUILD_DIR = 'build'
-    }
-
+    agent { label 'ubuntu' }
     stages {
         stage('Checkout') {
             steps {
-                // Clean workspace before checking out
-                cleanWs()
-                
-                // Checkout your repository
-                checkout scm
+                git url: 'https://github.com/MuhammadAbideen/jenkinstutorial.git', branch: 'main'
             }
         }
-
         stage('Install Dependencies') {
             steps {
-                script {
-                    // Install required packages on Ubuntu
-                    sh '''
-                        sudo apt-get update
-                        sudo apt-get install -y cmake g++ build-essential
-                    '''
-                }
+                sh '''
+                    sudo apt-get update
+                    sudo apt-get install -y cmake g++ ninja-build
+                '''
             }
         }
-
         stage('Build') {
             steps {
-                script {
-                    // Create build directory and run CMake
-                    sh """
-                        mkdir -p ${BUILD_DIR}
-                        cd ${BUILD_DIR}
-                        cmake ..
-                        cmake --build . --config Release
-                    """
-                }
+                sh '''
+                    mkdir -p build
+                    cd build
+                    cmake .. -G "Unix Makefiles"
+                    make
+                '''
             }
         }
-
         stage('Run') {
             steps {
-                script {
-                    // Run the compiled executable
-                    sh """
-                        cd ${BUILD_DIR}
-                        ./mathdemo
-                    """
-                }
+                sh './build/mathdemo'
             }
         }
     }
-
     post {
-        success {
-            echo 'Pipeline completed successfully!'
+        always {
+            echo 'Pipeline completed.'
         }
         failure {
-            echo 'Pipeline failed. Please check the logs for details.'
-        }
-        always {
-            // Clean up workspace after build
-            cleanWs()
+            echo 'Pipeline failed!'
         }
     }
 }
