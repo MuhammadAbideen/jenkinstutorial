@@ -2,7 +2,6 @@ pipeline {
     agent {
         docker {
             image 'ghcr.io/rikorose/gcc-cmake:latest'
-            args '-v jenkins_home:/var/jenkins_home'
         }
     }
     stages {
